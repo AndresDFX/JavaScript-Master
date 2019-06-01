@@ -34,7 +34,7 @@ body{
     display: flex;
     background: #7f8c8d;
     align-items: flex-end;
-    background-image: url("../assets/emarosa.jpg");
+    background-image: url("../assets/Old_Town_Road_cover.jpg");
     background-size: cover;
 }
 
@@ -92,7 +92,7 @@ body{
     flex:1;
 }
 
-.timeBar{
+.progressBar{
     flex: 8;
     height: 5px;
     margin: 0 5px;
@@ -100,7 +100,7 @@ body{
     cursor: pointer;
 }
 
-.timeBar div{
+.progressBar div{
     width: 1%;
     background: var(--black-red-c2);
     transition: all 0.3s ease;

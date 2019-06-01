@@ -2,7 +2,7 @@ class AudioPlayer {
 
     constructor(params) {
 
-        //this.songs = [];
+        this.songs = [];
         this.queue = [];
         this.player = new Audio();
         let src = "songs/1.mp3";
@@ -29,9 +29,9 @@ class AudioPlayer {
             next: null,
             add: null
         }
-        
+
         this._loadSong(src);
-        
+
         if (params.hasOwnProperty("buttons")) {
             var { queue, volume, back, playPause, next, add } = params.buttons;
             this._initButtons(queue, volume, back, playPause, next, add);
@@ -47,16 +47,26 @@ class AudioPlayer {
                 currentTime: { value: 0, DOMElement: this.gui.currentTime.DOMElement }
             }
         }
+        this.player.ontimeupdate = () => {
+            //console.log(this.player.currentTime);
+            this.gui = {
+                currentTime: { value: this.player.currentTime, DOMElement: this.gui.currentTime.DOMElement }
+            }
+            var [totalTime, currentTime] = [this.gui.totalTime.value, this.gui.currentTime.value];
+            var progress = (currentTime / totalTime) * 100;
+            let pBar = this.gui.progressBar.DOMElement.querySelector("div");
+            pBar.style.width = `${progress}%`;
+        }
     }
 
     _initGUI(...params) {
         this.gui = {
-            progressBar: params[0] || { value: null, DOMElement: null },
-            artistName: params[1] || { value: null, DOMElement: null },
-            songName: params[2] || { value: null, DOMElement: null },
-            currentTime: params[3] || { value: null, DOMElement: null },
-            totalTime: params[4] || { value: null, DOMElement: null },
-            albumCover: params[5] || { value: null, DOMElement: null }
+            progressBar: params[0] || { value: null, DOMElement: null },
+            artistName: params[1] || { value: null, DOMElement: null },
+            songName: params[2] || { value: null, DOMElement: null },
+            currentTime: params[3] || { value: null, DOMElement: null },
+            totalTime: params[4] || { value: null, DOMElement: null },
+            albumCover: params[5] || { value: null, DOMElement: null }
         };
     }
 
@@ -75,6 +85,13 @@ class AudioPlayer {
         //console.log(element);
         if (element instanceof HTMLElement) {
             element.onclick = callback;
+        } else {
+            if (element.hasOwnProperty("DOMElement")) {
+                element = element.DOMElement;
+                if (element instanceof HTMLElement) {
+                    element.onclick = callback;
+                }
+            }
         }
     }
 
@@ -96,8 +113,11 @@ class AudioPlayer {
             const key = keys[i];
             if (elements[key] != null) {
                 toAssign[key] = elements[key];
-                if(Object.keys(actions).length > 0){
-                    this._addClickEvent(toAssign[key], actions[key]);
+                if (Object.keys(actions).length > 0) {
+                    if (actions.hasOwnProperty(key)) {
+                        console.log(key);
+                        this._addClickEvent(toAssign[key], actions[key]);
+                    }
                 }
             }
         }
@@ -124,7 +144,7 @@ class AudioPlayer {
             add: () => false,
 
         }
-        this._assignValues(this._buttons,btns,actions);
+        this._assignValues(this._buttons, btns, actions);
     }
 
     get buttons() {
@@ -132,9 +152,25 @@ class AudioPlayer {
     }
 
     set gui(elments) {
-        this._assignValues(this._gui, elments);
-        if(this._gui.totalTime.DOMElement instanceof HTMLElement){
-            this._gui.totalTime.DOMElement.innerHTML = this._gui.totalTime.value;
+        let actions = {
+            progressBar: (e) => {
+                let x = e.offsetX;
+                let w = this.gui.progressBar.DOMElement.offsetWidth;
+                let newCurrentTime = this.gui.totalTime.value * (x/w);
+                this.player.currentTime = newCurrentTime;
+                this.gui = {
+                    currentTime: {value: newCurrentTime, DOMElement: this.gui.currentTime.DOMElement}
+                }
+            }
+        }
+        this._assignValues(this._gui, elments, actions);
+        this._updateBasigGUIElement(this.gui.totalTime);
+        this._updateBasigGUIElement(this.gui.currentTime);
+    }
+
+    _updateBasigGUIElement(el) {
+        if (el.DOMElement instanceof HTMLElement) {
+            el.DOMElement.innerHTML = el.value;
         }
     }
 

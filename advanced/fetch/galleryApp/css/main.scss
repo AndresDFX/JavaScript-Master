@@ -1,0 +1,37 @@
+body{
+    display: flex;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100vw;
+    height: 100%;
+    #app{
+        display: flex;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        padding-right: 0px;
+        .column{
+            display: flex;
+            flex-flow: column;
+            padding-right: 10px;
+            .pic{
+                width: 100%;
+                margin-bottom: 5px;
+                img{
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+.placeholder{
+    animation: loading 1s ease 0.4s infinite alternate;
+}
+
+@keyframes loading{
+    from { opacity: 1;}
+    to { opacity: 0.4;}
+}
